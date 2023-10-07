@@ -5,19 +5,19 @@
       <form @submit.prevent="createTask">
         <div class="form-group">
           <label for="title">Título:</label>
-          <input type="text" class="form-control" id="title_task" v-model="task.title" required>
+          <input type="text" class="form-control" id="title_task" v-model="task.title_task" required>
         </div>
         <div class="form-group">
           <label for="description">Descripción:</label>
-          <textarea class="form-control" id="description_task" v-model="task.description" required></textarea>
+          <textarea class="form-control" id="description_task" v-model="task.description_task" required></textarea>
         </div>
         <div class="form-group">
           <label for="dueDate">Fecha de Vencimiento:</label>
-          <input type="date" class="form-control" id="expire_time" v-model="task.dueDate" required>
+          <input type="date" class="form-control" id="expire_time" v-model="task.expire_date" required>
         </div>
         <div class="form-group">
           <label for="dueTime">Hora de Vencimiento:</label>
-          <input type="time" class="form-control" id="dueTime" v-model="task.dueTime" required>
+          <input type="time" class="form-control" id="dueTime" v-model="task.expire_time" required>
         </div>
         <button type="submit" class="btn btn-primary">Crear Tarea</button>
       </form>
@@ -45,13 +45,12 @@ export default {
 
     const createTask = () => {
       const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
       if (token) {
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
-        
         const decodedToken = jwtDecode(token);
         task.value.id_user = decodedToken.id;
 
-        const magicalTask = {
+        const newTask = {
           title_task: task.value.title_task,
           description_task: task.value.description_task,
           expire_date: task.value.expire_date,
@@ -60,7 +59,7 @@ export default {
           id_user: task.value.id_user
         };
 
-        axios.post('http://localhost:8080/task', magicalTask)
+        axios.post('http://localhost:8080/task', newTask)
         .then(response => {
           console.log('Respuesta del servidor:', response.data);
         })

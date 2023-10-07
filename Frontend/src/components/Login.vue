@@ -46,101 +46,91 @@
 
 <script>
 import axios from 'axios';
-import {ref} from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
   name: "login",
+  
   setup() {
-    const username=ref(""),
-    password=ref(""),
-    error=ref("");
+    const username = ref("");
+    const password = ref("");
+    const error = ref("");
     const router = useRouter();
 
-    const login=() => {
-      const credentials = {
-        username: username.value,
-        password: password.value
-      };
-
-      // Realizar una solicitud POST al servidor para autenticar al usuario
-      axios.post('http://localhost:8080/auth/login', credentials)
+    const postToServer = (endpoint, credentials) => {
+      axios.post(`http://localhost:8080/auth/login`, credentials)
         .then(response => {
-          // Manejar la respuesta del servidor aquí
           console.log('Respuesta del servidor:', response.data);
-          
-          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
           localStorage.setItem('token', response.data.token);
-          
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
-
           router.push('/task');
         })
         .catch(e => {
-          error.value = 'Usuario o contraseña incorrectos.';
+          if (endpoint === 'login') {
+            error.value = 'Usuario o contraseña incorrectos.';
+          } else if (endpoint === 'register') {
+            error.value = 'Usuario existente.';
+          }
 
           setTimeout(() => {
-            error.value = ""
-          }, 5000);        
+            error.value = "";
+          }, 5000);
         });
     }
 
-    const register=() => {
+    const login = () => {
       const credentials = {
         username: username.value,
         password: password.value
       };
-      // Realizar una solicitud POST al servidor para autenticar al usuario
-      axios.post('http://localhost:8080/auth/register', credentials)
-        .then(response => {
-          // Manejar la respuesta del servidor aquí
-          console.log('Respuesta del servidor:', response.data);
-          
-          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
-          localStorage.setItem('token', response.data.token);
-          
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
-          router.push('/task');
-        })
-        .catch(e => {
-          error.value = 'Usuario existente.';
-
-          setTimeout(() => {
-            error.value = ""
-          }, 5000);
-        })
+      postToServer('login', credentials);
     }
 
-    const change = () => {
+    const register = () => {
+      const credentials = {
+        username: username.value,
+        password: password.value
+      };
+
+      postToServer('register', credentials);
+    }
+
+    const changeView = () => {
       const d = document;
+      const $login = d.querySelector(".login");
+      const $register = d.querySelector(".register");
+      const $btnLogin = d.getElementById("btnLogin");
+      const $btnRegister = d.getElementById("btnRegister");
 
-      const $login = d.querySelector(".login"),
-        $register = d.querySelector(".register");
-      const $btnLogin = d.getElementById("btnLogin"),
-        $btnRegister = d.getElementById("btnRegister");
-
-      $btnRegister.addEventListener("click", (e) => {
+      $btnRegister.addEventListener("click", () => {
         setTimeout(() => {
           $login.classList.remove("hide");
         }, 200);
-
         $register.classList.add("hide");
       });
 
-      $btnLogin.addEventListener("click", (e) => {
+      $btnLogin.addEventListener("click", () => {
         $login.classList.add("hide");
-
         setTimeout(() => {
           $register.classList.remove("hide");
         }, 200);
       });
     };
 
-    return {login, register, change, username, password, error}
+    return {
+      login,
+      register,
+      changeView,
+      username,
+      password,
+      error
+    }
   }
 };
 </script>
+
 
 <style scoped>
 .cars{
