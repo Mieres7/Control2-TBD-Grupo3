@@ -35,11 +35,11 @@ export default {
     return {
       tarea: {
         title_task: '',
-        descripcion: '',
-        fechaVencimiento: '',
-        horaVencimiento: '',
-        estado: 'pendiente',
-        idUsuario: 'idDelUsuario'
+        description_task: '',
+        expire_date: '',
+        expire_time: '',
+        status_task: 'PENDIENTE',
+        id_user: 1
       }
     }
   },
