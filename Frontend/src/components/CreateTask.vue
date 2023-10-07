@@ -1,57 +1,132 @@
 <template>
-  <div class="container">
-    <h2 class="my-3">Crear tarea mágica</h2>
-    <form @submit.prevent="crearTareaMágica">
-      <div class="form-group">
-        <label>Titulo:</label>
-        <input class="form-control" v-model="tarea.titulo" />
-      </div>
-      
-      <div class="form-group">
-        <label>Descripción:</label>
-        <textarea class="form-control" v-model="tarea.descripcion"></textarea>
-      </div>
-      
-      <div class="form-group">
-        <label>Fecha de Vencimiento:</label>
-        <input type="date" class="form-control" v-model="tarea.fechaVencimiento" />
-      </div>
-      
-      <div class="form-group">
-        <label>Hora de Vencimiento:</label>
-        <input type="time" class="form-control" v-model="tarea.horaVencimiento" />
-      </div>
-
-      <button type="submit" class="btn btn-primary">Invocar tarea</button>
-    </form>
-  </div>
+  <body>
+    <div class="cars createTask">
+      <h2>Crear Tarea</h2>
+      <form @submit.prevent="createTask">
+        <div class="form-group">
+          <label for="title">Título:</label>
+          <input type="text" class="form-control" id="title_task" v-model="task.title" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Descripción:</label>
+          <textarea class="form-control" id="description_task" v-model="task.description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="dueDate">Fecha de Vencimiento:</label>
+          <input type="date" class="form-control" id="expire_time" v-model="task.dueDate" required>
+        </div>
+        <div class="form-group">
+          <label for="dueTime">Hora de Vencimiento:</label>
+          <input type="time" class="form-control" id="dueTime" v-model="task.dueTime" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Tarea</button>
+      </form>
+    </div>
+  </body>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from 'vue';
+import jwtDecode from 'jwt-decode';
 
 export default {
-  data() {
-    return {
-      tarea: {
-        title_task: '',
-        description_task: '',
-        expire_date: '',
-        expire_time: '',
-        status_task: 'PENDIENTE',
-        id_user: 1
+  name: "createTask",
+  setup() {
+    const task = ref({
+      title_task: '',
+      description_task: '',
+      expire_date: '',
+      expire_time: '',
+      status_task: 'PENDIENTE',
+      id_user: ''
+    });
+    const error = ref("");
+
+    const createTask = () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+        
+        const decodedToken = jwtDecode(token);
+        task.value.id_user = decodedToken.id;
+
+        const magicalTask = {
+          title_task: task.value.title_task,
+          description_task: task.value.description_task,
+          expire_date: task.value.expire_date,
+          expire_time: task.value.expire_time,
+          status_task: task.value.status_task,
+          id_user: task.value.id_user
+        };
+
+        axios.post('http://localhost:8080/task', magicalTask)
+        .then(response => {
+          console.log('Respuesta del servidor:', response.data);
+        })
+        .catch(e => {
+          error.value = 'Error al crear la tarea: ' + e.message;
+          setTimeout(() => {
+            error.value = ""
+          }, 5000);
+        })
+      } else {
+        error.value = 'Token no encontrado. Por favor, autentíquese primero.';
+        setTimeout(() => {
+          error.value = ""
+        }, 5000);
       }
-    }
-  },
-  methods: {
-    async crearTareaMágica() {
-      try {
-        const respuesta = await axios.post('http://localhost:8080/task', this.tarea)
-        console.log('Tarea mágicamente creada:', respuesta.data)
-      } catch (error) {
-        console.error('El hechizo falló:', error)
-      }
-    }
+    };
+
+    return { createTask, task, error }
   }
-}
+};
 </script>
+
+<style scoped>
+.cars{
+  width: 500px;
+  border: 1px solid white;
+  padding: 10px;
+  height: 480px;
+  border-radius: 16px;
+  transform: translateY(0);
+  transition: transform 1.5s ease;
+}
+
+.form-group, h2, .btn{
+  margin: 10px;
+}
+
+body{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+  background: none;
+}
+
+.regBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: "Quicksand", sans-serif;
+  color: #333;
+}
+
+.regBtn:hover {
+  color: #003366;
+  transition: 0.1 ease;
+}
+
+.hide {
+  position: fixed;
+  transform: translate(0, -300%);
+  transition: transform 2s ease;
+}
+
+</style>

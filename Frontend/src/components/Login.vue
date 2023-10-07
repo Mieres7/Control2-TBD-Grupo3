@@ -36,6 +36,9 @@
         <button class="regBtn" id="btnRegister" @click.prevent="change">
               Inicia sesión
         </button>
+        <div v-if="error" class="alert alert-danger">
+          {{ error }}
+        </div>
       </form>
     </div>
   </body>
@@ -71,17 +74,14 @@ export default {
           
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
-          router.push('/about');
+          router.push('/task');
         })
         .catch(e => {
           error.value = 'Usuario o contraseña incorrectos.';
 
           setTimeout(() => {
             error.value = ""
-          }, 5000);
-
-          // Manejar los errores aquí, como mostrar un mensaje de error al usuario.
-          
+          }, 5000);        
         });
     }
 
@@ -101,11 +101,14 @@ export default {
           
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
-          this.$router.push('/about');
+          router.push('/task');
         })
         .catch(e => {
-          // Manejar los errores aquí, como mostrar un mensaje de error al usuario.
-          console.error('Error al registrarse:', e.message);
+          error.value = 'Usuario existente.';
+
+          setTimeout(() => {
+            error.value = ""
+          }, 5000);
         })
     }
 
