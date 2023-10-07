@@ -1,0 +1,30 @@
+-- CREAR TABLAS DE BASE DE DATOS GRUPO 3.
+
+BEGIN;
+
+-- Creación de las tablas
+
+CREATE TABLE IF NOT EXISTS public.user(
+    id_user SERIAL PRIMARY KEY,
+    username TEXT COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    password TEXT COLLATE pg_catalog."default",
+    role TEXT COLLATE pg_catalog."default");
+
+CREATE TABLE IF NOT EXISTS public.task(
+    id_task SERIAL PRIMARY KEY,
+    title_task TEXT COLLATE pg_catalog."default",
+    description_task TEXT COLLATE pg_catalog."default",
+    expire_date DATE,
+    expire_time TIME,
+    state_task TEXT COLLATE pg_catalog."default",
+    id_user INTEGER);
+
+-- Creación de las relaciones
+
+ALTER TABLE IF EXISTS public.task
+    ADD CONSTRAINT "idUserFK" FOREIGN KEY (id_user)
+    REFERENCES public.user (id_user) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+COMMIT;

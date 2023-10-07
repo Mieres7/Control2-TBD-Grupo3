@@ -1,10 +1,11 @@
 package grupo3.control2.Repositories;
 
 import grupo3.control2.Entities.UserEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import java.util.List;
 
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
-    Optional<UserEntity> findByUsername(String username);
+public interface UserRepository {
+    List<UserEntity> findByUsername(String username);
+
+    Integer save(UserEntity user);
 }
