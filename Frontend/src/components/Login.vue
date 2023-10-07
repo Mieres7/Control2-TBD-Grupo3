@@ -44,6 +44,7 @@
 <script>
 import axios from 'axios';
 import {ref} from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "login",
@@ -51,6 +52,7 @@ export default {
     const username=ref(""),
     password=ref(""),
     error=ref("");
+    const router = useRouter();
 
     const login=() => {
       const credentials = {
@@ -62,14 +64,14 @@ export default {
       axios.post('http://localhost:8080/auth/login', credentials)
         .then(response => {
           // Manejar la respuesta del servidor aquí
-          //console.log('Respuesta del servidor:', response.data);
+          console.log('Respuesta del servidor:', response.data);
           
           // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
           localStorage.setItem('token', response.data.token);
           
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
-          this.$router.push('/about');
+          router.push('/about');
         })
         .catch(e => {
           error.value = 'Usuario o contraseña incorrectos.';

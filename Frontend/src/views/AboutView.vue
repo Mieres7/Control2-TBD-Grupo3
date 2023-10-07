@@ -1,16 +1,18 @@
 <template>
-  <div class="about">
-    <h1>This is an about page <WelcomeItem class="vue"> </WelcomeItem></h1>
-
+  <div class="about"> 
+    <CreateTask/>
   </div>
 </template>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
+<script setup>
+import CreateTask from '../components/CreateTask.vue';
+</script>
+
+<style scoped>
+.about{
+  min-height: 100vh;
+  width: 100%;
+  background-color: grey;
+  background-size: cover;
 }
 </style>

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.task(
     description_task TEXT COLLATE pg_catalog."default",
     expire_date DATE,
     expire_time TIME,
-    state_task TEXT COLLATE pg_catalog."default",
+    status_task TEXT COLLATE pg_catalog."default",
     id_user INTEGER);
 
 -- Creación de las relaciones
