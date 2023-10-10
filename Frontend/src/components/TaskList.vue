@@ -2,41 +2,43 @@
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
+import jwtDecode from "jwt-decode";
+import TaskFilter from "./TaskFilter.vue";
 export default {
   name: "TaskList",
+  components: {TaskFilter},
   setup() {
     const d = document;
-    // const taskList = ref([
-    //   {
-    //     id_task: "0",
-    //     title_task: "lala",
-    //     description_task: "adfjadslkjfkldsjf",
-    //     status_task: "Pendiente",
-    //     expire_date: "2023-10-08",
-    //     expire_time: "18:0:00.100",
-    //     id_user: "0",
-    //   },
-    //   {
-    //     title_task: "laaaa",
-    //     description_task: "asdfadsfd",
-    //     status_task: "Pendiente",
-    //     expire_date: "2023-10-08",
-    //     expire_time: "18:0:00.100",
-    //   },
-    //   {},
-    // ]);
     const taskList = ref([]);
-    const title_task = "",
-      description_task = "",
-      date_task = "",
-      time_task = "";
+    const title_task = ref(""),
+      description_task = ref(""),
+      date_task = ref(""),
+      time_task = ref(""),
+      id_user = ref(""),
+      id_task = ref(""),
+      status_task = ref("");
     const router = useRouter();
 
     function deleteTask(task_id) {
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + localStorage.getItem("token");
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        id_user.value = decodedToken.id;
 
-      axios.delete("http://localhost:8080/task/" + task_id);
+        axios.delete("http://localhost:8080/task/" + task_id)
+        .then((response) => {
+            taskList.value = response.data;
+            getTask();
+            console.log("Respuesta del servidor:", response.data);
+          })
+          .catch((e) => {
+            error.value = "Error al crear la tarea: " + e.message;
+            setTimeout(() => {
+              error.value = "";
+            }, 5000);
+          });
+      }
     }
 
     function modifier() {
@@ -54,64 +56,97 @@ export default {
       $overlay.style.zIndex = "-1";
       $modifier.style.opacity = "0";
     }
-    function updateTask(index) {
-      const newTask = {
-        id_task: taskList[index].id_task,
-        title_task: this.title_task,
-        description_task: this.description_task,
-        status_task: taskList[index].status_task,
-        expire_date: this.date_task,
-        expire_time: this.time_task,
-        id_user: taskList[index].id_user,
-      };
 
-      try {
-        axios.put(
-          "http://localhost:8080/task/" + taskList[index].id_task,
-          newTask
-        );
-      } catch (error) {
-        console.log(error);
+    function updateTask(id_task, index) {
+      const status = taskList.value[index].status_task;
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        id_user.value = decodedToken.id;
+
+        const formattedTime = `${time_task.value}:00`;
+
+        const newTask = {
+          title_task: title_task.value,
+          description_task: description_task.value,
+          expire_date: date_task.value,
+          expire_time: formattedTime,
+          status_task: status,
+          id_user: id_user.value,
+        };
+
+        axios.put("http://localhost:8080/task/" + id_task, newTask)
+          .then((response) => {
+            getTask();
+            console.log("Respuesta del servidor:", response.data);
+          })
+          .catch((e) => {
+            error.value = "Error al modificar la tarea: " + e.message;
+            setTimeout(() => {
+              error.value = "";
+            }, 5000);
+          });
+      } else {
+        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        setTimeout(() => {
+          error.value = "";
+        }, 5000);
       }
     }
 
     function getTask() {
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
       if (token) {
         const decodedToken = jwtDecode(token);
-        task.value.id_user = decodedToken.id;
-        taskList = axios.get(
-          "http://localhost:8080/tasks/" + task.value.id_user
-        );
+        id_user.value = decodedToken.id;
+
+        axios.get("http://localhost:8080/tasks/" + id_user.value)
+        .then((response) => {
+            taskList.value = response.data;
+            console.log("Respuesta del servidor:", response.data);
+          })
+          .catch((e) => {
+            error.value = "Error al crear la tarea: " + e.message;
+            setTimeout(() => {
+              error.value = "";
+            }, 5000);
+          });
       }
     }
 
-    function completeTask(index) {
-      const updatedTask = {
-        id_task: taskList[index].id_task,
-        title_task: taskList[index].title_task,
-        description_task: taskList[index].description_task,
-        status_task: "COMPLETADA",
-        expire_date: taskList[index].expire_date,
-        expire_time: taskList[index].expire_time,
-        id_user: taskList[index].id_user,
-      };
+    function completeTask(id_task, index) {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
 
-      try {
-        axios.put(
-          "http://localhost:8080/task/" + taskList[index].id_task,
-          updatedTask
-        );
-      } catch (error) {
-        console.log(error);
+      if (token) {
+        const newTask = taskList.value[index];
+        const status = "COMPLETADA";
+
+        console.log(newTask);
+
+        newTask.status_task = status;
+
+        axios.put("http://localhost:8080/task/" + id_task, newTask)
+          .then((response) => {
+            getTask();
+            console.log("Respuesta del servidor:", response.data);
+          })
+          .catch((e) => {
+            error.value = "Error al modificar la tarea: " + e.message;
+            setTimeout(() => {
+              error.value = "";
+            }, 5000);
+          });
+      } else {
+        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        setTimeout(() => {
+          error.value = "";
+        }, 5000);
       }
     }
 
-    // function changeView() {
-    //   router.push("/task");
-    // }
 
     onMounted(() => {
       getTask();
@@ -129,6 +164,8 @@ export default {
       description_task,
       date_task,
       time_task,
+      status_task,
+      id_task,
     };
   },
 };
@@ -136,7 +173,9 @@ export default {
 
 <template>
   <div class="task-container">
-    <div class="filters"></div>
+    <div class="filters">
+      <TaskFilter />
+    </div>
     <div class="tasks">
       <div class="task" v-for="(t, index) in taskList" :key="index">
         <div class="info">
@@ -146,9 +185,9 @@ export default {
           <p>Estado: {{ t.status_task }}</p>
         </div>
         <div>
-          <button @click="deleteTask">Eliminar</button>
+          <button @click="deleteTask(t.id_task)">Eliminar</button>
           <button @click="modifier">Editar</button>
-          <button @click="completeTask(index)">Completar</button>
+          <button @click="completeTask(t.id_task, index)">Completar</button>
         </div>
         <div class="overlay" @click="close">
           <div class="modifier" @click.stop>
@@ -161,7 +200,7 @@ export default {
             <input type="date" v-model="date_task" />
             <p>Hora de vencimiento</p>
             <input type="time" v-model="time_task" />
-            <button @click="updateTask(index)">Confirmar</button>
+            <button @click="updateTask(t.id_task, index)">Confirmar</button>
           </div>
         </div>
       </div>
@@ -185,6 +224,8 @@ export default {
 
 .tasks {
   grid-area: tasks;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 .filters {

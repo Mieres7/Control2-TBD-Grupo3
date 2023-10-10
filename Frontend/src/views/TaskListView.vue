@@ -12,7 +12,7 @@ import TaskList from "../components/TaskList.vue";
 .main {
   width: 100%;
   height: 100vh;
-  background-color: grey;
+  background-color: #114c5f;
   display: flex;
   align-items: center;
   justify-content: center;

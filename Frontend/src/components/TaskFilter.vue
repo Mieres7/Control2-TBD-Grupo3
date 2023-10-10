@@ -29,7 +29,7 @@ import { ref } from 'vue';
 import jwtDecode from 'jwt-decode';
 
 export default {
-  name: "fetchFilteredTasksComponent",
+  name: "TaskFilter",
   setup() {
     const tasks = ref([]);
     const keyword = ref('');

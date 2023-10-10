@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface TaskRepository {
 
-    long save(TaskEntity task);
+    Integer save(TaskEntity task);
 
-    void update(TaskEntity taskUpdated, long id_task);
+    void update(TaskEntity taskUpdated, Integer id_task);
 
-    void delete(long id_task);
+    void delete(Integer id_task);
 
-    List<TaskEntity> getTaskByUser(long id_user);
+    List<TaskEntity> getTaskByUser(Integer id_user);
 
-    List<TaskEntity> getTaskByKeywords(long id_user, String keywords, String status);
+    List<TaskEntity> getTaskByKeywords(Integer id_user, String keywords, String status);
 }

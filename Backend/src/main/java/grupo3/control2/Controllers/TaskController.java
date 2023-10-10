@@ -25,25 +25,25 @@ public class TaskController {
 
     @PutMapping("/task/{id_task}")
     @ResponseBody
-    public ResponseEntity<TaskEntity> update(@RequestBody TaskEntity task, @PathVariable long id_task) {
+    public ResponseEntity<TaskEntity> update(@RequestBody TaskEntity task, @PathVariable Integer id_task) {
         taskRepository.update(task, id_task);
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
 
     @DeleteMapping("/task/{id_task}")
     @ResponseBody
-    public ResponseEntity<String> delete(@PathVariable long id_task) {
+    public ResponseEntity<String> delete(@PathVariable Integer id_task) {
         taskRepository.delete(id_task);
         return ResponseEntity.status(HttpStatus.OK).body("Task deleted successfully.");
     }
 
     @GetMapping("/tasks/{id_user}")
-    public List<TaskEntity> getTasksByUser(@PathVariable long id_user) {
+    public List<TaskEntity> getTasksByUser(@PathVariable Integer id_user) {
         return taskRepository.getTaskByUser(id_user);
     }
 
     @GetMapping("/tasks/{id_user}/key/{keywords}/status/{status}")
-    public List<TaskEntity> getTasksByKeyWords(@PathVariable long id_user, @PathVariable String keywords, @PathVariable String status) {
+    public List<TaskEntity> getTasksByKeyWords(@PathVariable Integer id_user, @PathVariable String keywords, @PathVariable String status) {
         return taskRepository.getTaskByKeywords(id_user, keywords, status);
     }
 }

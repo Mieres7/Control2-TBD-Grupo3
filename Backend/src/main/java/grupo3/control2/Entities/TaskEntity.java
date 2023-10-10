@@ -12,11 +12,11 @@ import java.util.Date;
 @Entity
 public class TaskEntity {
     @Id
-    long id_task;
+    Integer id_task;
     String title_task;
     String description_task;
     Date expire_date;
     Time expire_time;
     String status_task;
-    long id_user;
+    Integer id_user;
 }

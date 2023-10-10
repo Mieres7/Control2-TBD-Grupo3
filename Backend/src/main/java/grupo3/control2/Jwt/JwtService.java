@@ -28,7 +28,7 @@ public class JwtService {
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
-        String id = String.valueOf(userService.findByUsername(user.getUsername()).get(0).getId_user());
+        String id = userService.findByUsername(user.getUsername()).get(0).getId_user().toString();
         return Jwts
                 .builder()
                 .setClaims(extraClaims)

@@ -18,12 +18,12 @@ public class TaskService implements TaskRepository {
     private Sql2o sql2o;
 
     @Override
-    public long save(TaskEntity task) {
+    public Integer save(TaskEntity task) {
 
         try(Connection conn = sql2o.open()) {
             String sql = "INSERT INTO public.task (title_task, description_task, expire_date, expire_time, status_task, id_user) " +
                     "VALUES (:title_task, :description_task, :expire_date, :expire_time, :status_task, :id_user)";
-            return (long) conn.createQuery(sql, true)
+            return (Integer) conn.createQuery(sql, true)
                     .addParameter("title_task", task.getTitle_task())
                     .addParameter("description_task", task.getDescription_task())
                     .addParameter("expire_date", task.getExpire_date())
@@ -41,7 +41,7 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public void update(TaskEntity taskUpdated, long id_task) {
+    public void update(TaskEntity taskUpdated, Integer id_task) {
         try(Connection conn = sql2o.open()) {
             String sql = "UPDATE public.task SET title_task = :title_task, description_task = :description_task," +
                     "expire_date = :expire_date, expire_time = :expire_time, status_task = :status_task, id_user = :id_user WHERE id_task = :id_task";
@@ -62,7 +62,7 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public void delete(long id_task) {
+    public void delete(Integer id_task) {
         try(Connection conn = sql2o.open()) {
             String sql = "DELETE FROM public.task WHERE id_task = :id_task";
 
@@ -76,10 +76,9 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public List<TaskEntity> getTaskByUser(long id_user) {
-        System.out.println(id_user);
+    public List<TaskEntity> getTaskByUser(Integer id_user) {
         try(Connection conn = sql2o.open()) {
-            String sql = "SELECT * FROM public.task WHERE id_user = :id_user ORDER BY ASC";
+            String sql = "SELECT * FROM public.task WHERE id_user = :id_user";
 
             return conn.createQuery(sql)
                     .addParameter("id_user", id_user)
@@ -92,7 +91,7 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public List<TaskEntity> getTaskByKeywords(long id_user, String keywords, String status) {
+    public List<TaskEntity> getTaskByKeywords(Integer id_user, String keywords, String status) {
         String[] words = keywords.split(" ");
 
         if (Objects.equals(status, "TODOS")) {

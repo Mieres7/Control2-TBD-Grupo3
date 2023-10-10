@@ -24,17 +24,18 @@ export default {
         const decodedToken = jwtDecode(token);
         task.value.id_user = decodedToken.id;
 
+        const formattedTime = `${task.value.expire_time}:00`;
+
         const newTask = {
           title_task: task.value.title_task,
           description_task: task.value.description_task,
           expire_date: task.value.expire_date,
-          expire_time: task.value.expire_time,
+          expire_time: formattedTime,
           status_task: task.value.status_task,
           id_user: task.value.id_user,
         };
 
-        axios
-          .post("http://localhost:8080/task", newTask)
+        axios.post("http://localhost:8080/task", newTask)
           .then((response) => {
             console.log("Respuesta del servidor:", response.data);
           })
@@ -93,7 +94,7 @@ export default {
           />
         </div>
         <div class="form-group">
-          <label for="dueTime">Hora de Vencimiento:</label>
+          <label for="Time">Hora de Vencimiento:</label>
           <input
             type="time"
             class="form-control"
