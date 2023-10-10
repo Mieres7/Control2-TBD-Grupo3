@@ -6,7 +6,7 @@ import jwtDecode from "jwt-decode";
 import TaskFilter from "./TaskFilter.vue";
 export default {
   name: "TaskList",
-  components: {TaskFilter},
+  components: { TaskFilter },
   setup() {
     const d = document;
     const taskList = ref([]);
@@ -17,17 +17,18 @@ export default {
       id_user = ref(""),
       id_task = ref(""),
       status_task = ref("");
-    const router = useRouter();
 
     function deleteTask(task_id) {
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + localStorage.getItem("token");
       if (token) {
         const decodedToken = jwtDecode(token);
         id_user.value = decodedToken.id;
 
-        axios.delete("http://localhost:8080/task/" + task_id)
-        .then((response) => {
+        axios
+          .delete("http://localhost:8080/task/" + task_id)
+          .then((response) => {
             taskList.value = response.data;
             getTask();
             console.log("Respuesta del servidor:", response.data);
@@ -60,7 +61,8 @@ export default {
     function updateTask(id_task, index) {
       const status = taskList.value[index].status_task;
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + localStorage.getItem("token");
       if (token) {
         const decodedToken = jwtDecode(token);
         id_user.value = decodedToken.id;
@@ -76,7 +78,8 @@ export default {
           id_user: id_user.value,
         };
 
-        axios.put("http://localhost:8080/task/" + id_task, newTask)
+        axios
+          .put("http://localhost:8080/task/" + id_task, newTask)
           .then((response) => {
             getTask();
             console.log("Respuesta del servidor:", response.data);
@@ -97,15 +100,16 @@ export default {
 
     function getTask() {
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + localStorage.getItem("token");
       if (token) {
         const decodedToken = jwtDecode(token);
         id_user.value = decodedToken.id;
 
-        axios.get("http://localhost:8080/tasks/" + id_user.value)
-        .then((response) => {
+        axios
+          .get("http://localhost:8080/tasks/" + id_user.value)
+          .then((response) => {
             taskList.value = response.data;
-            console.log("Respuesta del servidor:", response.data);
           })
           .catch((e) => {
             error.value = "Error al crear la tarea: " + e.message;
@@ -118,7 +122,8 @@ export default {
 
     function completeTask(id_task, index) {
       const token = localStorage.getItem("token");
-      axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + localStorage.getItem("token");
 
       if (token) {
         const newTask = taskList.value[index];
@@ -128,10 +133,10 @@ export default {
 
         newTask.status_task = status;
 
-        axios.put("http://localhost:8080/task/" + id_task, newTask)
+        axios
+          .put("http://localhost:8080/task/" + id_task, newTask)
           .then((response) => {
             getTask();
-            console.log("Respuesta del servidor:", response.data);
           })
           .catch((e) => {
             error.value = "Error al modificar la tarea: " + e.message;
@@ -147,19 +152,50 @@ export default {
       }
     }
 
+    const getTaskFiltered = async (keyword, statusFilter) => {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const userId = decodedToken.id;
+          const response = await axios.get(
+            "http://localhost:8080/tasks/" +
+              userId +
+              "/key/" +
+              keyword +
+              "/status/" +
+              statusFilter.toUpperCase()
+          );
+          taskList.value = response.data;
+        } catch (e) {
+          console.log(e);
+          error.value = "Error al buscar tareas: " + e.message;
+          setTimeout(() => {
+            error.value = "";
+          }, 5000);
+        }
+      } else {
+        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        setTimeout(() => {
+          error.value = "";
+        }, 5000);
+      }
+    };
 
     onMounted(() => {
       getTask();
     });
 
     return {
-      taskList,
       deleteTask,
       modifier,
       close,
       updateTask,
       getTask,
       completeTask,
+      getTaskFiltered,
+      taskList,
       title_task,
       description_task,
       date_task,
@@ -174,7 +210,7 @@ export default {
 <template>
   <div class="task-container">
     <div class="filters">
-      <TaskFilter />
+      <TaskFilter @filterTaskSignal="getTaskFiltered" />
     </div>
     <div class="tasks">
       <div class="task" v-for="(t, index) in taskList" :key="index">
@@ -230,12 +266,9 @@ export default {
 
 .filters {
   grid-area: filters;
-  
-  
-  justify-content:center;
-  align-items: center;
 
-  
+  justify-content: center;
+  align-items: center;
 }
 
 .task {
