@@ -10,6 +10,7 @@ import org.sql2o.Sql2o;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService implements TaskRepository {
@@ -17,12 +18,12 @@ public class TaskService implements TaskRepository {
     private Sql2o sql2o;
 
     @Override
-    public Integer save(TaskEntity task) {
+    public long save(TaskEntity task) {
 
         try(Connection conn = sql2o.open()) {
             String sql = "INSERT INTO public.task (title_task, description_task, expire_date, expire_time, status_task, id_user) " +
                     "VALUES (:title_task, :description_task, :expire_date, :expire_time, :status_task, :id_user)";
-            return (Integer) conn.createQuery(sql, true)
+            return (long) conn.createQuery(sql, true)
                     .addParameter("title_task", task.getTitle_task())
                     .addParameter("description_task", task.getDescription_task())
                     .addParameter("expire_date", task.getExpire_date())
@@ -40,7 +41,7 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public void update(TaskEntity taskUpdated, Integer id_task) {
+    public void update(TaskEntity taskUpdated, long id_task) {
         try(Connection conn = sql2o.open()) {
             String sql = "UPDATE public.task SET title_task = :title_task, description_task = :description_task," +
                     "expire_date = :expire_date, expire_time = :expire_time, status_task = :status_task, id_user = :id_user WHERE id_task = :id_task";
@@ -61,7 +62,7 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public void delete(Integer id_task) {
+    public void delete(long id_task) {
         try(Connection conn = sql2o.open()) {
             String sql = "DELETE FROM public.task WHERE id_task = :id_task";
 
@@ -75,59 +76,53 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
-    public List<TaskEntity> getTaskByUser(Integer id_user) {
+    public List<TaskEntity> getTaskByUser(long id_user) {
+        System.out.println(id_user);
         try(Connection conn = sql2o.open()) {
-            String sql = "SELECT * FROM public.task WHERE id_user = :id_user ORDER BY status_task ASC";
+            String sql = "SELECT * FROM public.task WHERE id_user = :id_user ORDER BY ASC";
 
             return conn.createQuery(sql)
                     .addParameter("id_user", id_user)
                     .executeAndFetch(TaskEntity.class);
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public List<TaskEntity> getTaskByStatus(Integer id_user, String status) {
-        try(Connection conn = sql2o.open()) {
-            String sql = "SELECT * FROM public.task WHERE id_user = :id_user AND status_task = :status";
-
-            return conn.createQuery(sql)
-                    .addParameter("id_user", id_user)
-                    .addParameter("status", status)
-                    .executeAndFetch(TaskEntity.class);
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    @Override
-    public List<TaskEntity> getTaskByKeywords(Integer id_user, String section, String keywords) {
+    public List<TaskEntity> getTaskByKeywords(long id_user, String keywords, String status) {
         String[] words = keywords.split(" ");
-        List<String> conditions = new ArrayList<>();
 
-        String sql = "SELECT * FROM public.task WHERE id_user = :id_user AND ";
+        if (Objects.equals(status, "TODOS")) {
+            String sql = "SELECT * FROM public.task WHERE id_user = :id_user AND (LOWER(title_task) LIKE :keyword OR LOWER(description_task) LIKE :keyword)";
 
-        for (String word : words) {
-            conditions.add(section + "LIKE :" + word);
-        }
+            try (Connection conn = sql2o.open()) {
+                Query query = conn.createQuery(sql).addParameter("id_user", id_user);
 
-        sql += String.join(" OR ", conditions);
+                for (String word : words) {
+                    query.addParameter("keyword", "%" + word.toLowerCase() + "%");
+                }
 
-        try(Connection conn = sql2o.open()) {
-            Query query = conn.createQuery(sql);
-
-            for(String word : words) {
-                query.addParameter("word", "%" + word + "%");
+                return query.executeAndFetch(TaskEntity.class);
             }
-
-            return query.executeAndFetch(TaskEntity.class);
         }
+
+        else {
+            String sql = "SELECT * FROM public.task WHERE id_user = :id_user AND status_task = :status AND (LOWER(title_task) LIKE :keyword OR LOWER(description_task) LIKE :keyword)";
+
+            try (Connection conn = sql2o.open()) {
+                Query query = conn.createQuery(sql).addParameter("id_user", id_user)
+                        .addParameter("status", status);
+
+                for (String word : words) {
+                    query.addParameter("keyword", "%" + word.toLowerCase() + "%");
+                }
+
+                return query.executeAndFetch(TaskEntity.class);
+            }
+        }
+
     }
-
-
 }

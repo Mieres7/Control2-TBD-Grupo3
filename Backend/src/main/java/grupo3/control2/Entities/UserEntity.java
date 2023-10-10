@@ -19,7 +19,7 @@ import java.util.List;
 @Entity
 public class UserEntity implements UserDetails {
     @Id
-    Integer id_user;
+    long id_user;
     String username;
     String password;
     RoleEntity role;

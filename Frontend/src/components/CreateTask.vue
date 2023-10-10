@@ -118,6 +118,7 @@ export default {
   border-radius: 16px;
   transform: translateY(0);
   transition: transform 1.5s ease;
+  color:white;
 }
 
 .form-group,

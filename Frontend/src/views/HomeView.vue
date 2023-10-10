@@ -12,7 +12,7 @@ import login from '../components/Login.vue';
 .home{
   min-height: 100vh;
   width: 100%;
-  background-color: grey;
+  background-color: #114c5f;
   background-size: cover;
 }
 </style>

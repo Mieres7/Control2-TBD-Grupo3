@@ -4,17 +4,16 @@ import grupo3.control2.Entities.TaskEntity;
 
 import java.util.List;
 
+
 public interface TaskRepository {
 
-    Integer save(TaskEntity task);
+    long save(TaskEntity task);
 
-    void update(TaskEntity taskUpdated, Integer id_task);
+    void update(TaskEntity taskUpdated, long id_task);
 
-    void delete(Integer id_task);
+    void delete(long id_task);
 
-    List<TaskEntity> getTaskByUser(Integer id_user);
+    List<TaskEntity> getTaskByUser(long id_user);
 
-    List<TaskEntity> getTaskByStatus(Integer id_user, String status);
-
-    List<TaskEntity> getTaskByKeywords(Integer id_user, String section, String keywords);
+    List<TaskEntity> getTaskByKeywords(long id_user, String keywords, String status);
 }

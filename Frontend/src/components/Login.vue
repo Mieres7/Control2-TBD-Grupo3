@@ -166,6 +166,7 @@ export default {
   border-radius: 16px;
   transform: translateY(0);
   transition: transform 1.5s ease;
+  color:white;
 }
 
 .form-group,
@@ -191,11 +192,11 @@ body {
   cursor: pointer;
   text-decoration: underline;
   font-family: "Quicksand", sans-serif;
-  color: #333;
+  color: white;
 }
 
 .regBtn:hover {
-  color: #003366;
+  color: #9cd2d3;
   transition: 0.1 ease;
 }
 

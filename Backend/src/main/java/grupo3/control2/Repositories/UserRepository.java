@@ -7,5 +7,5 @@ import java.util.List;
 public interface UserRepository {
     List<UserEntity> findByUsername(String username);
 
-    Integer save(UserEntity user);
+    long save(UserEntity user);
 }

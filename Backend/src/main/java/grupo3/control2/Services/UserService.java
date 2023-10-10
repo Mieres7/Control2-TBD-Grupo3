@@ -27,10 +27,10 @@ public class UserService implements UserRepository {
     }
 
     @Override
-    public Integer save(UserEntity user) {
+    public long save(UserEntity user) {
         try(Connection conn = sql2o.open()) {
             String sql = "INSERT INTO public.user (username, password, role) VALUES (:username, :password, :role)";
-            return (Integer) conn.createQuery(sql, true)
+            return (long) conn.createQuery(sql, true)
                     .addParameter("username", user.getUsername())
                     .addParameter("password", user.getPassword())
                     .addParameter("role", user.getRole())
