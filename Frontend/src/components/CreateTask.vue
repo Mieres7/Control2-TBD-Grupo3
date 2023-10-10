@@ -1,51 +1,25 @@
-<template>
-  <body>
-    <div class="cars createTask">
-      <h2>Crear Tarea</h2>
-      <form @submit.prevent="createTask">
-        <div class="form-group">
-          <label for="title">Título:</label>
-          <input type="text" class="form-control" id="title_task" v-model="task.title_task" required>
-        </div>
-        <div class="form-group">
-          <label for="description">Descripción:</label>
-          <textarea class="form-control" id="description_task" v-model="task.description_task" required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="dueDate">Fecha de Vencimiento:</label>
-          <input type="date" class="form-control" id="expire_time" v-model="task.expire_date" required>
-        </div>
-        <div class="form-group">
-          <label for="dueTime">Hora de Vencimiento:</label>
-          <input type="time" class="form-control" id="dueTime" v-model="task.expire_time" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Crear Tarea</button>
-      </form>
-    </div>
-  </body>
-</template>
-
 <script>
-import axios from 'axios';
-import { ref } from 'vue';
-import jwtDecode from 'jwt-decode';
+import axios from "axios";
+import { ref } from "vue";
+import jwtDecode from "jwt-decode";
 
 export default {
   name: "createTask",
   setup() {
     const task = ref({
-      title_task: '',
-      description_task: '',
-      expire_date: '',
-      expire_time: '',
-      status_task: 'PENDIENTE',
-      id_user: ''
+      title_task: "",
+      description_task: "",
+      expire_date: "",
+      expire_time: "",
+      status_task: "PENDIENTE",
+      id_user: "",
     });
     const error = ref("");
 
     const createTask = () => {
-      const token = localStorage.getItem('token');
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + localStorage.getItem("token");
       if (token) {
         const decodedToken = jwtDecode(token);
         task.value.id_user = decodedToken.id;
@@ -56,34 +30,87 @@ export default {
           expire_date: task.value.expire_date,
           expire_time: task.value.expire_time,
           status_task: task.value.status_task,
-          id_user: task.value.id_user
+          id_user: task.value.id_user,
         };
 
-        axios.post('http://localhost:8080/task', newTask)
-        .then(response => {
-          console.log('Respuesta del servidor:', response.data);
-        })
-        .catch(e => {
-          error.value = 'Error al crear la tarea: ' + e.message;
-          setTimeout(() => {
-            error.value = ""
-          }, 5000);
-        })
+        axios
+          .post("http://localhost:8080/task", newTask)
+          .then((response) => {
+            console.log("Respuesta del servidor:", response.data);
+          })
+          .catch((e) => {
+            error.value = "Error al crear la tarea: " + e.message;
+            setTimeout(() => {
+              error.value = "";
+            }, 5000);
+          });
       } else {
-        error.value = 'Token no encontrado. Por favor, autentíquese primero.';
+        error.value = "Token no encontrado. Por favor, autentíquese primero.";
         setTimeout(() => {
-          error.value = ""
+          error.value = "";
         }, 5000);
       }
     };
 
-    return { createTask, task, error }
-  }
+    return { createTask, task, error };
+  },
 };
 </script>
 
+<template>
+  <body>
+    <div class="cards createTask">
+      <h2>Crear Tarea</h2>
+      <form @submit.prevent="createTask">
+        <div class="form-group">
+          <label for="title">Título:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="title_task"
+            v-model="task.title_task"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="description">Descripción:</label>
+          <textarea
+            class="form-control"
+            id="description_task"
+            v-model="task.description_task"
+            required
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="dueDate">Fecha de Vencimiento:</label>
+          <input
+            type="date"
+            class="form-control"
+            id="expire_time"
+            v-model="task.expire_date"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="dueTime">Hora de Vencimiento:</label>
+          <input
+            type="time"
+            class="form-control"
+            id="dueTime"
+            v-model="task.expire_time"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Tarea</button>
+      </form>
+    </div>
+    <router-link to="/taskList">Listado de Tareas</router-link>
+  </body>
+</template>
+
 <style scoped>
-.cars{
+.cards {
   width: 500px;
   border: 1px solid white;
   padding: 10px;
@@ -93,11 +120,13 @@ export default {
   transition: transform 1.5s ease;
 }
 
-.form-group, h2, .btn{
+.form-group,
+h2,
+.btn {
   margin: 10px;
 }
 
-body{
+body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,4 +157,12 @@ body{
   transition: transform 2s ease;
 }
 
+#description_task {
+  resize: none;
+}
+
+a {
+  color: #fff;
+  margin: 10px;
+}
 </style>
