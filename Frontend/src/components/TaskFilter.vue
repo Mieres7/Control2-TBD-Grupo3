@@ -19,16 +19,14 @@
 </template>
 
 <script>
-import axios from "axios";
 import { ref } from "vue";
-import jwtDecode from "jwt-decode";
 
 export default {
   name: "TaskFilter",
   emits: ["filterTaskSignal"],
   setup(_, { emit }) {
     const tasks = ref([]);
-    const keyword = ref("all");
+    const keyword = ref("");
     const statusFilter = ref("todos");
 
     const error = ref("");

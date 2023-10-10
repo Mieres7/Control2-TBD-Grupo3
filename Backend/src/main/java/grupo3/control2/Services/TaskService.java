@@ -90,6 +90,37 @@ public class TaskService implements TaskRepository {
     }
 
     @Override
+    public List<TaskEntity> getTaskByStatus(Integer id_user, String status) {
+        if (Objects.equals(status, "TODOS")) {
+            try(Connection conn = sql2o.open()) {
+                String sql = "SELECT * FROM public.task WHERE id_user = :id_user";
+
+                return conn.createQuery(sql)
+                        .addParameter("id_user", id_user)
+                        .executeAndFetch(TaskEntity.class);
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+        }
+        else {
+            try(Connection conn = sql2o.open()) {
+                String sql = "SELECT * FROM public.task WHERE id_user = :id_user AND status_task = :status";
+
+                return conn.createQuery(sql)
+                        .addParameter("id_user", id_user)
+                        .addParameter("status", status)
+                        .executeAndFetch(TaskEntity.class);
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+        }
+    }
+
+    @Override
     public List<TaskEntity> getTaskByKeywords(Integer id_user, String keywords, String status) {
         String[] words = keywords.split(" ");
 

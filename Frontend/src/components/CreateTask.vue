@@ -15,6 +15,7 @@ export default {
       id_user: "",
     });
     const error = ref("");
+    const advice = ref("");
 
     const createTask = () => {
       const token = localStorage.getItem("token");
@@ -35,11 +36,12 @@ export default {
           id_user: task.value.id_user,
         };
 
-        console.log(newTask);
-
         axios.post("http://localhost:8080/task", newTask)
           .then((response) => {
-            console.log("Respuesta del servidor:", response.data);
+            advice.value = "Tarea creada correctamente.";
+            setTimeout(() => {
+              advice.value = "";
+            }, 5000);
           })
           .catch((e) => {
             error.value = "Error al crear la tarea: " + e.message;
@@ -55,7 +57,7 @@ export default {
       }
     };
 
-    return { createTask, task, error };
+    return { createTask, task, error, advice};
   },
 };
 </script>
@@ -109,6 +111,7 @@ export default {
       </form>
     </div>
     <router-link to="/taskList">Listado de Tareas</router-link>
+    <p id="advice">{{ advice }}</p>
   </body>
 </template>
 
@@ -122,6 +125,10 @@ export default {
   transform: translateY(0);
   transition: transform 1.5s ease;
   color:white;
+}
+
+#advice {
+  color: white;
 }
 
 .form-group,

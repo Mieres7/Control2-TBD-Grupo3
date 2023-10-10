@@ -42,6 +42,11 @@ public class TaskController {
         return taskRepository.getTaskByUser(id_user);
     }
 
+    @GetMapping("/tasks/{id_user}/{status}")
+    public List<TaskEntity> getTasksByStatus(@PathVariable Integer id_user, @PathVariable String status) {
+        return taskRepository.getTaskByStatus(id_user, status);
+    }
+
     @GetMapping("/tasks/{id_user}/key/{keywords}/status/{status}")
     public List<TaskEntity> getTasksByKeyWords(@PathVariable Integer id_user, @PathVariable String keywords, @PathVariable String status) {
         return taskRepository.getTaskByKeywords(id_user, keywords, status);

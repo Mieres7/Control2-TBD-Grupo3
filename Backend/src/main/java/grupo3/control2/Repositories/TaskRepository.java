@@ -15,5 +15,7 @@ public interface TaskRepository {
 
     List<TaskEntity> getTaskByUser(Integer id_user);
 
+    List<TaskEntity> getTaskByStatus(Integer id_user, String status);
+
     List<TaskEntity> getTaskByKeywords(Integer id_user, String keywords, String status);
 }

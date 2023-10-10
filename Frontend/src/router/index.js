@@ -25,16 +25,16 @@ const router = createRouter({
   
 })
 
-// Guardia de navegación para verificar la autenticación.
-// router.beforeEach((to, from, next) => {
-//   const token = localStorage.getItem('token');  // Asume que el token JWT se almacena bajo la clave 'token'.
 
-//   // Comprueba si la ruta requiere autenticación y si el token no existe.
-//   if (to.matched.some(record => record.meta.requiresAuth) && !token) {
-//     next('/')  // Redirigir al inicio o a la página de inicio de sesión.
-//   } else {
-//     next()  // De lo contrario, continuar con la ruta.
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  // Comprueba si la ruta requiere autenticación y si el token no existe.
+  if (to.matched.some(record => record.meta.requiresAuth) && !token) {
+    next('/')  // Redirigir al inicio o a la página de inicio de sesión.
+  } else {
+    next()  // De lo contrario, continuar con la ruta.
+  }
+})
 
 export default router
