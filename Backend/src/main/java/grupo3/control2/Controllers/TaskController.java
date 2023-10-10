@@ -19,6 +19,7 @@ public class TaskController {
     @PostMapping("/task")
     @ResponseBody
     public ResponseEntity<TaskEntity> save(@RequestBody TaskEntity task) {
+        System.out.println(task.getExpire_date());
         task.setId_task(taskRepository.save(task));
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }

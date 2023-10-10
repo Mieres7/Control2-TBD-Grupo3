@@ -19,7 +19,6 @@ public class TaskService implements TaskRepository {
 
     @Override
     public Integer save(TaskEntity task) {
-
         try(Connection conn = sql2o.open()) {
             String sql = "INSERT INTO public.task (title_task, description_task, expire_date, expire_time, status_task, id_user) " +
                     "VALUES (:title_task, :description_task, :expire_date, :expire_time, :status_task, :id_user)";
