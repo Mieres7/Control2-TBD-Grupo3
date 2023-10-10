@@ -5,15 +5,27 @@
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="username">Usuario:</label>
-          <input type="text" class="form-control" id="username" v-model="username" required>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            v-model="username"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="password">Contraseña:</label>
-          <input type="password" class="form-control" id="password" v-model="password" required>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            v-model="password"
+            required
+          />
         </div>
         <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
         <button class="regBtn" id="btnLogin" @click.prevent="change">
-              Regístrate
+          Regístrate
         </button>
         <div v-if="error" class="alert alert-danger">
           {{ error }}
@@ -26,15 +38,27 @@
       <form @submit.prevent="register">
         <div class="form-group">
           <label for="username">Usuario:</label>
-          <input type="text" class="form-control" id="username" v-model="username" required>
+          <input
+            type="text"
+            class="form-control"
+            id="username"
+            v-model="username"
+            required
+          />
         </div>
         <div class="form-group">
           <label for="password">Contraseña:</label>
-          <input type="password" class="form-control" id="password" v-model="password" required>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            v-model="password"
+            required
+          />
         </div>
         <button type="submit" class="btn btn-primary">Regístrate</button>
         <button class="regBtn" id="btnRegister" @click.prevent="change">
-              Inicia sesión
+          Inicia sesión
         </button>
         <div v-if="error" class="alert alert-danger">
           {{ error }}
@@ -45,13 +69,13 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import axios from "axios";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "login",
-  
+
   setup() {
     const username = ref("");
     const password = ref("");
@@ -59,43 +83,45 @@ export default {
     const router = useRouter();
 
     const postToServer = (endpoint, credentials) => {
-      axios.post(`http://localhost:8080/auth/login`, credentials)
-        .then(response => {
-          console.log('Respuesta del servidor:', response.data);
-          localStorage.setItem('token', response.data.token);
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
-          router.push('/task');
+      axios
+        .post(`http://localhost:8080/auth/login`, credentials)
+        .then((response) => {
+          console.log("Respuesta del servidor:", response.data);
+          localStorage.setItem("token", response.data.token);
+          axios.defaults.headers.common["Authorization"] =
+            "Bearer " + localStorage.getItem("token");
+          router.push("/task");
         })
-        .catch(e => {
-          if (endpoint === 'login') {
-            error.value = 'Usuario o contraseña incorrectos.';
-          } else if (endpoint === 'register') {
-            error.value = 'Usuario existente.';
+        .catch((e) => {
+          if (endpoint === "login") {
+            error.value = "Usuario o contraseña incorrectos.";
+          } else if (endpoint === "register") {
+            error.value = "Usuario existente.";
           }
 
           setTimeout(() => {
             error.value = "";
           }, 5000);
         });
-    }
+    };
 
     const login = () => {
       const credentials = {
         username: username.value,
-        password: password.value
+        password: password.value,
       };
 
-      postToServer('login', credentials);
-    }
+      postToServer("login", credentials);
+    };
 
     const register = () => {
       const credentials = {
         username: username.value,
-        password: password.value
+        password: password.value,
       };
 
-      postToServer('register', credentials);
-    }
+      postToServer("register", credentials);
+    };
 
     const changeView = () => {
       const d = document;
@@ -125,15 +151,14 @@ export default {
       changeView,
       username,
       password,
-      error
-    }
-  }
+      error,
+    };
+  },
 };
 </script>
 
-
 <style scoped>
-.cars{
+.cars {
   width: 300px;
   border: 1px solid white;
   padding: 10px;
@@ -143,11 +168,13 @@ export default {
   transition: transform 1.5s ease;
 }
 
-.form-group, h2, .btn{
+.form-group,
+h2,
+.btn {
   margin: 10px;
 }
 
-body{
+body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,5 +204,4 @@ body{
   transform: translate(0, -300%);
   transition: transform 2s ease;
 }
-
 </style>
