@@ -230,7 +230,12 @@ export default {
 
 .filters {
   grid-area: filters;
-  background-color: aliceblue;
+  
+  
+  justify-content:center;
+  align-items: center;
+
+  
 }
 
 .task {
