@@ -1,6 +1,5 @@
 <script>
 import axios from "axios";
-import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 import jwtDecode from "jwt-decode";
 import TaskFilter from "./TaskFilter.vue";
@@ -16,7 +15,8 @@ export default {
       time_task = ref(""),
       id_user = ref(""),
       id_task = ref(""),
-      status_task = ref("");
+      status_task = ref(""),
+      advice = ref("");
 
     function deleteTask(task_id) {
       const token = localStorage.getItem("token");
@@ -31,16 +31,44 @@ export default {
           .then((response) => {
             taskList.value = response.data;
             getTask();
-            console.log("Respuesta del servidor:", response.data);
+            advice.value = "Tarea eliminada correctamente.";
+            setTimeout(() => {
+              advice.value = "";
+            }, 5000);
           })
           .catch((e) => {
-            error.value = "Error al crear la tarea: " + e.message;
+            console.log("Error del servidor:", e.message);
+            advice.value = "Error al eliminar tarea.";
             setTimeout(() => {
-              error.value = "";
+              advice.value = "";
             }, 5000);
           });
       }
+      else {
+        advice.value = "Token no encontrado. Por favor, autentíquese primero.";
+        setTimeout(() => {
+          advice.value = "";
+        }, 5000);
+      }
     }
+
+    const verificarTareas = () => {
+      const ahora = new Date();
+      for (const tarea of taskList.value) {
+        const vencimiento = new Date(
+          tarea.expire_date + 'T' + tarea.expire_time
+        );
+        const tiempoRestanteMs = vencimiento - ahora;
+        const tiempoRestanteMin = tiempoRestanteMs / 60000; // Convertir a minutos
+        if (tiempoRestanteMin == 10 && tiempoRestanteMin > 0) {
+          mostrarAlert(`Tarea: ${tarea.title_task} vence en 10 minutos`);
+        }
+      }
+    };
+
+    const mostrarAlert = (mensaje) => {
+          alert(mensaje);
+        };
 
     function modifier() {
       const $modifier = d.querySelector(".modifier"),
@@ -82,18 +110,22 @@ export default {
           .put("http://localhost:8080/task/" + id_task, newTask)
           .then((response) => {
             getTask();
-            console.log("Respuesta del servidor:", response.data);
+            advice.value = "Tarea actualizada correctamente.";
+            setTimeout(() => {
+              advice.value = "";
+            }, 5000);
           })
           .catch((e) => {
-            error.value = "Error al modificar la tarea: " + e.message;
+            console.log("Error del servidor:", e.message);
+            advice.value = "Error al actualizar tarea, verifique los campos.";
             setTimeout(() => {
-              error.value = "";
+              advice.value = "";
             }, 5000);
           });
       } else {
-        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        advice.value = "Token no encontrado. Por favor, autentíquese primero.";
         setTimeout(() => {
-          error.value = "";
+          advice.value = "";
         }, 5000);
       }
     }
@@ -112,11 +144,17 @@ export default {
             taskList.value = response.data;
           })
           .catch((e) => {
-            error.value = "Error al crear la tarea: " + e.message;
+            advice.value = "Error al cargar las tareas: " + e.message;
             setTimeout(() => {
-              error.value = "";
+              advice.value = "";
             }, 5000);
           });
+      }
+      else {
+        advice.value = "Token no encontrado. Por favor, autentíquese primero.";
+        setTimeout(() => {
+          advice.value = "";
+        }, 5000);
       }
     }
 
@@ -129,25 +167,27 @@ export default {
         const newTask = taskList.value[index];
         const status = "COMPLETADA";
 
-        console.log(newTask);
-
         newTask.status_task = status;
 
         axios
           .put("http://localhost:8080/task/" + id_task, newTask)
           .then((response) => {
             getTask();
+            advice.value = "Tarea actualizada correctamente.";
+            setTimeout(() => {
+              advice.value = "";
+            }, 5000);
           })
           .catch((e) => {
-            error.value = "Error al modificar la tarea: " + e.message;
+            advice.value = "Error al actualizar la tarea: " + e.message;
             setTimeout(() => {
-              error.value = "";
+              advice.value = "";
             }, 5000);
           });
       } else {
-        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        advice.value = "Token no encontrado. Por favor, autentíquese primero.";
         setTimeout(() => {
-          error.value = "";
+          advice.value = "";
         }, 5000);
       }
     }
@@ -159,7 +199,17 @@ export default {
         try {
           const decodedToken = jwtDecode(token);
           const userId = decodedToken.id;
-          const response = await axios.get(
+          if (keyword === "") {
+            const response = await axios.get(
+            "http://localhost:8080/tasks/" +
+              userId +
+              "/" +
+              statusFilter.toUpperCase()
+          );
+          taskList.value = response.data;
+          }
+          else {
+            const response = await axios.get(
             "http://localhost:8080/tasks/" +
               userId +
               "/key/" +
@@ -168,23 +218,26 @@ export default {
               statusFilter.toUpperCase()
           );
           taskList.value = response.data;
+          }
         } catch (e) {
           console.log(e);
-          error.value = "Error al buscar tareas: " + e.message;
+          advice.value = "Error al buscar tareas: " + e.message;
           setTimeout(() => {
-            error.value = "";
+            advice.value = "";
           }, 5000);
         }
       } else {
-        error.value = "Token no encontrado. Por favor, autentíquese primero.";
+        advice.value = "Token no encontrado. Por favor, autentíquese primero.";
         setTimeout(() => {
-          error.value = "";
+          advice.value = "";
         }, 5000);
       }
     };
 
     onMounted(() => {
       getTask();
+      verificarTareas();
+      setInterval(verificarTareas, 60000); // Verificar cada minuto
     });
 
     return {
@@ -202,6 +255,7 @@ export default {
       time_task,
       status_task,
       id_task,
+      advice,
     };
   },
 };
@@ -218,7 +272,13 @@ export default {
           <p>Nombre: {{ t.title_task }}</p>
         </div>
         <div>
+          <p>Descripción: {{ t.description_task }}</p>
+        </div>
+        <div>
           <p>Estado: {{ t.status_task }}</p>
+        </div>
+        <div>
+          <p>VENCE: {{ t.expire_date }}</p>
         </div>
         <div>
           <button @click="deleteTask(t.id_task)">Eliminar</button>
@@ -237,10 +297,12 @@ export default {
             <p>Hora de vencimiento</p>
             <input type="time" v-model="time_task" />
             <button @click="updateTask(t.id_task, index)">Confirmar</button>
+            <p id="advice"> {{ advice }} </p>
           </div>
         </div>
       </div>
     </div>
+    <p id="advice"> {{ advice }} </p>
   </div>
 
   <router-link to="/task">Crear Tarea</router-link>
@@ -248,7 +310,7 @@ export default {
 
 <style scoped>
 .task-container {
-  width: 80%;
+  width: 95%;
   height: 80%;
   border: 1px solid #fff;
   display: grid;
@@ -256,6 +318,10 @@ export default {
   grid-template-rows: 10% 90%;
   grid-template-areas: "filters" "tasks";
   border-radius: 16px;
+}
+
+#advice {
+  color: white;
 }
 
 .tasks {
