@@ -8,7 +8,6 @@
           <input
             type="text"
             class="form-control"
-            id="username"
             v-model="username"
             required
           />
@@ -18,7 +17,6 @@
           <input
             type="password"
             class="form-control"
-            id="password"
             v-model="password"
             required
           />
@@ -41,7 +39,6 @@
           <input
             type="text"
             class="form-control"
-            id="username"
             v-model="username"
             required
           />
@@ -51,7 +48,6 @@
           <input
             type="password"
             class="form-control"
-            id="password"
             v-model="password"
             required
           />
@@ -69,91 +65,100 @@
 </template>
 
 <script>
-import axios from "axios";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import axios from 'axios';
+import {ref} from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: "login",
-
   setup() {
-    const username = ref("");
-    const password = ref("");
-    const error = ref("");
+    const username=ref(""),
+    password=ref(""),
+    error=ref("");
     const router = useRouter();
 
-    const postToServer = (endpoint, credentials) => {
-      axios
-        .post(`http://localhost:8080/auth/login`, credentials)
-        .then((response) => {
-          console.log("Respuesta del servidor:", response.data);
-          localStorage.setItem("token", response.data.token);
-          axios.defaults.headers.common["Authorization"] =
-            "Bearer " + localStorage.getItem("token");
-          router.push("/task");
+    const login=() => {
+      const credentials = {
+        username: username.value,
+        password: password.value
+      };
+
+      // Realizar una solicitud POST al servidor para autenticar al usuario
+      axios.post('http://localhost:8080/auth/login', credentials)
+        .then(response => {
+          // Manejar la respuesta del servidor aquí
+          console.log('Respuesta del servidor:', response.data);
+          
+          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
+          localStorage.setItem('token', response.data.token);
+          
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+
+          router.push('/task');
         })
-        .catch((e) => {
-          if (endpoint === "login") {
-            error.value = "Usuario o contraseña incorrectos.";
-          } else if (endpoint === "register") {
-            error.value = "Usuario existente.";
-          }
+        .catch(e => {
+          error.value = 'Usuario o contraseña incorrectos.';
 
           setTimeout(() => {
-            error.value = "";
-          }, 5000);
+            error.value = ""
+          }, 5000);        
         });
-    };
+    }
 
-    const login = () => {
+    const register=() => {
       const credentials = {
         username: username.value,
-        password: password.value,
+        password: password.value
       };
+      // Realizar una solicitud POST al servidor para autenticar al usuario
+      axios.post('http://localhost:8080/auth/register', credentials)
+        .then(response => {
+          // Manejar la respuesta del servidor aquí
+          console.log('Respuesta del servidor:', response.data);
+          
+          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
+          localStorage.setItem('token', response.data.token);
+          
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
-      postToServer("login", credentials);
-    };
+          router.push('/task');
+        })
+        .catch(e => {
+          error.value = 'Usuario existente.';
 
-    const register = () => {
-      const credentials = {
-        username: username.value,
-        password: password.value,
-      };
+          setTimeout(() => {
+            error.value = ""
+          }, 5000);
+        })
+    }
 
-      postToServer("register", credentials);
-    };
-
-    const changeView = () => {
+    const change = () => {
       const d = document;
-      const $login = d.querySelector(".login");
-      const $register = d.querySelector(".register");
-      const $btnLogin = d.getElementById("btnLogin");
-      const $btnRegister = d.getElementById("btnRegister");
 
-      $btnRegister.addEventListener("click", () => {
+      const $login = d.querySelector(".login"),
+        $register = d.querySelector(".register");
+      const $btnLogin = d.getElementById("btnLogin"),
+        $btnRegister = d.getElementById("btnRegister");
+
+      $btnRegister.addEventListener("click", (e) => {
         setTimeout(() => {
           $login.classList.remove("hide");
         }, 200);
+
         $register.classList.add("hide");
       });
 
-      $btnLogin.addEventListener("click", () => {
+      $btnLogin.addEventListener("click", (e) => {
         $login.classList.add("hide");
+
         setTimeout(() => {
           $register.classList.remove("hide");
         }, 200);
       });
     };
 
-    return {
-      login,
-      register,
-      changeView,
-      username,
-      password,
-      error,
-    };
-  },
+    return {login, register, change, username, password, error}
+  }
 };
 </script>
 

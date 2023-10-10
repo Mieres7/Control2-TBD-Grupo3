@@ -35,6 +35,8 @@ export default {
           id_user: task.value.id_user,
         };
 
+        console.log(newTask);
+
         axios.post("http://localhost:8080/task", newTask)
           .then((response) => {
             console.log("Respuesta del servidor:", response.data);
