@@ -11,3 +11,6 @@ Configurar el frontend:
 1.	Desde una terminal dentro de la carpeta del frontend se debe ejecutar el comando “npm install”.
 2.	Al tener las dependencias instaladas se ejecuta el comando “npm run dev”.
 3.	Se accede a la ruta entregada por la terminal.
+
+
+Developed by @[benjaminCanalesC](https://github.com/benjaminCanalesC) and @[Mieres7](https://github.com/Mieres7)
