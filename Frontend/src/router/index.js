@@ -30,20 +30,28 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  if(token) {
+  
+  if (token) {
     const decodedToken = jwtDecode(token);
     const tokenExpireTime = decodedToken.exp;
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
 
-    // Comprueba si la ruta requiere autenticación y si el token es valido aún.
     if (to.matched.some(record => record.meta.requiresAuth) && (tokenExpireTime < currentTimeInSeconds)) {
-      next('/')
+      if (to.path !== '/') {
+        next('/');
+      } else {
+        next();
+      }
     } else {
-      next()
+      next();
     }
   } else {
-    next('/')
+    if (to.path !== '/') {
+      next('/');
+    } else {
+      next();
+    }
   }
-})
+});
 
 export default router
