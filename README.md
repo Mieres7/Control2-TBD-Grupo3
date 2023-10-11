@@ -1,4 +1,4 @@
-# Control 2 – TBD
+# Instrucción configuración Control 2 – TBD
 Para comenzar la configuración se requiere realizar un pull al repositorio https://github.com/Mieres7/Control2-TBD-Grupo3/.
 
 Configurar el backend:
