@@ -83,10 +83,9 @@ export default {
         password: password.value
       };
 
-      // Realizar una solicitud POST al servidor para autenticar al usuario
+      // Solicitud POST al servidor para autenticar al usuario
       axios.post('http://localhost:8080/auth/login', credentials)
         .then(response => {
-          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
           localStorage.setItem('token', response.data.token);
           
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
@@ -107,13 +106,9 @@ export default {
         username: username.value,
         password: password.value
       };
-      // Realizar una solicitud POST al servidor para autenticar al usuario
+      // Solicitud POST al servidor para autenticar al usuario
       axios.post('http://localhost:8080/auth/register', credentials)
         .then(response => {
-          // Manejar la respuesta del servidor aquí
-          console.log('Respuesta del servidor:', response.data);
-          
-          // Lógica adicional, como redireccionar a una página de inicio de sesión exitosa.
           localStorage.setItem('token', response.data.token);
           
           axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');

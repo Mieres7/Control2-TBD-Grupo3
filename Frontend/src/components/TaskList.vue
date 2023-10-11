@@ -144,7 +144,7 @@ export default {
             taskList.value = response.data;
           })
           .catch((e) => {
-            advice.value = "Error al cargar las tareas: " + e.message;
+            advice.value = "Error al cargar las tareas, autentíquese primero.";
             setTimeout(() => {
               advice.value = "";
             }, 5000);
@@ -179,7 +179,7 @@ export default {
             }, 5000);
           })
           .catch((e) => {
-            advice.value = "Error al actualizar la tarea: " + e.message;
+            advice.value = "Error al actualizar la tarea.";
             setTimeout(() => {
               advice.value = "";
             }, 5000);
@@ -221,7 +221,7 @@ export default {
           }
         } catch (e) {
           console.log(e);
-          advice.value = "Error al buscar tareas: " + e.message;
+          advice.value = "Error al buscar tareas.";
           setTimeout(() => {
             advice.value = "";
           }, 5000);

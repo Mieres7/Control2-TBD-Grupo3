@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import TaskListView from '../views/TaskListView.vue'
+import jwtDecode from "jwt-decode";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,12 +15,13 @@ const router = createRouter({
       path: '/task',
       name: 'task',
       component: () => import('../views/Task.vue'),
-      meta: { requiresAuth: true }  // Indicamos que esta ruta requiere autenticación.
+      meta: { requiresAuth: true }
     },
     {
       path: '/taskList',
       name: 'taskList',
-      component: TaskListView
+      component: TaskListView,
+      meta: { requiresAuth: true } 
     }
   ]
   
@@ -28,12 +30,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
+  const decodedToken = jwtDecode(token);
+  const tokenExpireTime = decodedToken.exp;
+  const currentTimeInSeconds = Math.floor(Date.now() / 1000);
 
-  // Comprueba si la ruta requiere autenticación y si el token no existe.
-  if (to.matched.some(record => record.meta.requiresAuth) && !token) {
-    next('/')  // Redirigir al inicio o a la página de inicio de sesión.
+  // Comprueba si la ruta requiere autenticación y si el token es valido aún.
+  if (to.matched.some(record => record.meta.requiresAuth) && (tokenExpireTime < currentTimeInSeconds)) {
+    next('/')
   } else {
-    next()  // De lo contrario, continuar con la ruta.
+    next()
   }
 })
 
