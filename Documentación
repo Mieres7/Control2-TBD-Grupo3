@@ -1,0 +1,5 @@
+La aplicación se implementó a partir de Spring Boot Java, Vue 3 y PostgreSQL, utilizando Spring Security, SQL2o y JWT Auth como dependencias y tecnologías relevantes.
+
+El sistema cuenta con tres entidades: user, task y role. Al ejecutarla se realiza la autenticación de JWT para el login y register del usuario, generando un token válido por 30 minutos. 
+Al ingresar el usuario podrá crear una tarea indicando el titulo, descripción, fecha y hora de vencimiento, por otro lado podrá también revisar la lista de tareas creadas filtrando por estado o palabra(s) clave.
+Puede también eliminar una tarea, editarla o marcarla como completada.
